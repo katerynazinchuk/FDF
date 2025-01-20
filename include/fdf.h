@@ -6,7 +6,7 @@
 /*   By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/18 18:22:54 by kzinchuk          #+#    #+#             */
-/*   Updated: 2025/01/18 20:28:13 by kzinchuk         ###   ########.fr       */
+/*   Updated: 2025/01/20 18:55:06 by kzinchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,12 @@ typedef struct s_iterator {
     int i;
     int j;
 }       t_iterator;
+
+typedef struct s_render_point {
+    int x;
+    int y;
+    uint32_t color;
+}       t_render_point;
 
 t_node *add_node(char *line);
 t_node *create_list(t_node **head, char *line);

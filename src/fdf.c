@@ -71,7 +71,15 @@ int32_t main(int argc, char **argv)
     }
 
     printf("Map dimensions: %dx%d, z_min: %d, z_max: %d\n", map->width, map->height, map->z_min, map->z_max);
-
+    printf("2D map was stored with dimensions %dx%d\n", map->width, map->height);
+    for (int i = 0; i < map->height; i++)
+    {
+        for (int j = 0; j < map->width; j++)
+        {
+            printf("%d ", (int)map->points[i][j].z);
+        }
+        printf("\n");
+    }
     t_fdf *fdf = malloc(sizeof(t_fdf));
     if (!fdf)
     {
