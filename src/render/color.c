@@ -6,11 +6,16 @@
 /*   By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 19:09:43 by kzinchuk          #+#    #+#             */
-/*   Updated: 2025/01/13 13:05:01 by kzinchuk         ###   ########.fr       */
+/*   Updated: 2025/01/24 19:24:33 by kzinchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+
+//add color range for z min and z max
+//implement zoom and rotation, also when rescale window dont lose the map that wasnt painted with the smaller window
+//find leaks
+//norminnete
 
 // int get_rgba(int r, int g, int b, int a)
 // {
