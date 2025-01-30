@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "fdf.h": "c"
-    }
+		"fdf.h": "c",
+		"functional": "c"
+	},
+    "editor.insertSpaces": false
 }

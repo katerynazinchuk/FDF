@@ -6,7 +6,7 @@
 #    By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/18 18:22:57 by kzinchuk          #+#    #+#              #
-#    Updated: 2025/01/24 19:19:46 by kzinchuk         ###   ########.fr        #
+#    Updated: 2025/01/28 19:35:04 by kzinchuk         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,8 @@ LIBFT := $(LIBFT_DIR)/libft.a
 LIBMLX := ./MLX42
 LIBS := $(LIBFT) $(LIBMLX)/build/libmlx42.a -ldl -lglfw -pthread -lm
 
-FDF = src/fdf/fdf.c src/fdf/fdf_controls.c
-PARSER = src/parser/parcer.c src/parser/create_node.c src/parser/map_check.c src/parser/parser_utils.c
+FDF = src/fdf/fdf.c src/fdf/fdf_utils.c src/fdf/key_controls.c
+PARSER = src/parser/parser.c src/parser/create_node.c src/parser/map_check.c src/parser/parser_utils.c
 RENDER = src/render/render.c src/render/color.c src/render/render_utils.c
 GNL = get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
 
