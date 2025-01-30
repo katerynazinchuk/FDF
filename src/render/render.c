@@ -6,121 +6,118 @@
 /*   By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 17:58:07 by kzinchuk          #+#    #+#             */
-/*   Updated: 2025/01/24 19:18:38 by kzinchuk         ###   ########.fr       */
+/*   Updated: 2025/01/28 19:16:57 by kzinchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void calculate_offsets(t_fdf *fdf, int *offset_x, int *offset_y)
+t_render_point	project_isometric(t_point point, float angle, t_fdf *fdf)
 {
+	t_render_point	result;
 
-    int center_x = fdf->map->width * GRIDSPASE / 2;
-    int center_y = fdf->map->height * GRIDSPASE / 2;
+	result.x = (int)((point.x - point.y) * cos(angle)) + fdf->offset_x;
+	result.y = (int)((point.x + point.y) * sin(angle) - point.z) + fdf->offset_y;
+	result.z = point.z;
+	result.color = point.color;
 
-    *offset_x = center_x;
-    *offset_y = center_y;
+	return result;
 }
 
-t_line new_line(t_render_point start, t_render_point end)
+void	bresenham_line(t_fdf *fdf, t_render_point start, t_render_point end)
 {
-    t_line line;
-    line.dx = ft_abs(end.x - start.x);
-    line.dy = ft_abs(end.y - start.y);
-    if (start.x < end.x)
-        line.sx = 1;
-    else
-        line.sx = -1;
+	t_line		line;
+	uint32_t	color_start;
+	uint32_t	color_end;
+	int			total_steps;
 
-    if (start.y < end.y)
-        line.sy = 1;
-    else
-        line.sy = -1;
-    line.err = line.dx - line.dy;
-    
-    return line;
+	line = new_line(start, end);
+	if(start.color != 0)
+		color_start = start.color;
+	else
+		color_start = calculate_gradient_color(fdf->map, start.z);
+	if (end.color != 0)
+		color_end = end.color;
+	else
+		color_end = calculate_gradient_color(fdf->map, end.z);
+	if (line.dx > line.dy)
+		total_steps = line.dx;
+	else
+		total_steps = line.dy;
+	int current_step = 0;
+	while (1)
+	{
+		float t = 0.0f;
+		if (total_steps != 0)
+			t = (float)current_step / total_steps;
+
+		uint32_t color = interpolate_color(color_start, color_end, t);
+		
+		if (start.x >= 0 && start.x < (int)fdf->img->width &&
+			start.y >= 0 && start.y < (int)fdf->img->height)
+			mlx_put_pixel(fdf->img, start.x, start.y, color);
+		if (start.x == end.x && start.y == end.y)
+			break;
+		int e2 = 2 * line.err;
+		if (e2 > -line.dy)
+		{
+			line.err -= line.dy;
+			start.x += line.sx;
+		}
+		if (e2 < line.dx)
+		{
+			line.err += line.dx;
+			start.y += line.sy;
+		}
+		current_step++;
+	}
 }
 
-t_render_point project_isometric(t_point point, int offset_x, int offset_y, float angle)
+static void draw_horizontal_lines(t_fdf *fdf, float angle)
 {
-    t_render_point result;
-    result.x = (int)((point.x - point.y) * cos(angle)) + offset_x;
-    result.y = (int)((point.x + point.y) * sin(angle) - point.z) + offset_y;
-    result.color = point.color;
+	int	x;
+	int	y;
 
-    return result;
+	y = 0;
+	while (y < fdf->map->height)
+	{
+		x = 0;
+		while (x + 1 < fdf->map->width)
+		{
+			t_render_point start = project_isometric(fdf->map->points[y][x], angle, fdf);
+			t_render_point end = project_isometric(fdf->map->points[y][x + 1], angle,  fdf);
+			bresenham_line(fdf, start, end);
+			x++;
+		}
+		y++;
+	}
 }
 
-void bresenham_line(t_fdf *fdf, t_render_point start, t_render_point end)
+static void	draw_vertical_lines(t_fdf *fdf, float angle)
 {
-    uint32_t color;
-    t_line line = new_line(start, end);
-    if(start.color !=0)
-        color = start.color;
-    else
-        color = 0xFFFF00FF;
-    while (1)
-    {
-        if (start.x >= 0 && start.x < (int)fdf->img->width && start.y >= 0 && start.y < (int)fdf->img->height)
-            mlx_put_pixel(fdf->img, start.x, start.y, color);
-        if (start.x == end.x && start.y == end.y)
-            break;
-        int e2 = 2 * line.err;
-        if (e2 > -line.dy)
-        {
-            line.err -= line.dy;
-            start.x += line.sx;
-        }
-        if (e2 < line.dx)
-        {
-            line.err += line.dx;
-            start.y += line.sy;
-        }
-    }
+	int	x;
+	int	y;
+
+	x = 0;
+	while (x < fdf->map->width)
+	{
+		y = 0;
+		while (y + 1 < fdf->map->height)
+		{
+			t_render_point start = project_isometric(fdf->map->points[y][x], angle, fdf);
+			t_render_point end = project_isometric(fdf->map->points[y + 1][x], angle, fdf);
+			bresenham_line(fdf, start, end);
+			y++;
+		}
+		x++;
+	}
 }
 
-static void draw_horizontal_lines(t_fdf *fdf, int offset_x, int offset_y, float angle)
+void	render_top_view(t_fdf *fdf)
 {
-    int y = 0;
-    while (y < fdf->map->height)
-    {
-        int x = 0;
-        while (x + 1 < fdf->map->width)
-        {
-            t_render_point start = project_isometric(fdf->map->points[y][x], offset_x, offset_y, angle);
-            t_render_point end = project_isometric(fdf->map->points[y][x + 1], offset_x, offset_y, angle);
-            bresenham_line(fdf, start, end);
-            x++;
-        }
-        y++;
-    }
-}
+	float	angle;
 
-static void draw_vertical_lines(t_fdf *fdf, int offset_x, int offset_y, float angle)
-{
-    int x = 0;
-    while (x < fdf->map->width)
-    {
-        int y = 0;
-        while (y + 1 < fdf->map->height)
-        {
-            t_render_point start = project_isometric(fdf->map->points[y][x], offset_x, offset_y, angle);
-            t_render_point end = project_isometric(fdf->map->points[y + 1][x], offset_x, offset_y, angle);
-            bresenham_line(fdf, start, end);
-            y++;
-        }
-        x++;
-    }
-}
-
-void render_top_view(t_fdf *fdf)
-{
-    int offset_x, offset_y;
-    float angle = 0.8;
-
-    offset_x = fdf->offset_x;
-    offset_y = fdf->offset_y;
-
-    draw_horizontal_lines(fdf, offset_x, offset_y, angle);
-    draw_vertical_lines(fdf, offset_x, offset_y, angle);
+	angle = 0.6;
+	draw_horizontal_lines(fdf, angle);
+	draw_vertical_lines(fdf, angle);
 }
