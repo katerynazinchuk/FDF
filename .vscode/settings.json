@@ -1,7 +1,8 @@
 {
     "files.associations": {
 		"fdf.h": "c",
-		"functional": "c"
+		"functional": "c",
+		"random": "c"
 	},
     "editor.insertSpaces": false
 }

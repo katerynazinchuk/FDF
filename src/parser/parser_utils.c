@@ -6,7 +6,7 @@
 /*   By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 19:10:58 by kzinchuk          #+#    #+#             */
-/*   Updated: 2025/01/28 19:53:17 by kzinchuk         ###   ########.fr       */
+/*   Updated: 2025/02/20 18:57:39 by kzinchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,7 @@ size_t	count_strings(const char *s, char delimiter)
 			}
 		}
 		else
-		{
 			in_word = 0;
-		}
 		s++;
 	}
 	return (count);
