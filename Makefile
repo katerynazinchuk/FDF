@@ -1,17 +1,11 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/12/18 18:22:57 by kzinchuk          #+#    #+#              #
-#    Updated: 2025/01/28 19:35:04 by kzinchuk         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+# colors
+GREEN  := \033[32m
+GREEN_BG := \033[42m
+BOLD := \033[1m
+PURPLE := \033[35m
+RESET  := \033[0m
 
-
-NAME := fdf
+NAME := FDF
 CC := cc
 CFLAGS_DEV := -Wall -Werror -Wextra -Iinclude -I./MLX42/include -I./libft -Iget_next_line -DDEBUG=1 -g3 -v 
 CFLAGS_PROD := -Wall -Werror -Wextra -O3 -Wunreachable-code 
@@ -22,16 +16,19 @@ LIBFT := $(LIBFT_DIR)/libft.a
 LIBMLX := ./MLX42
 LIBS := $(LIBFT) $(LIBMLX)/build/libmlx42.a -ldl -lglfw -pthread -lm
 
-FDF = src/fdf/fdf.c src/fdf/fdf_utils.c src/fdf/key_controls.c
+FDF = src/fdf/main.c src/fdf/fdf.c src/fdf/errors.c src/fdf/key_controls.c
 PARSER = src/parser/parser.c src/parser/create_node.c src/parser/map_check.c src/parser/parser_utils.c
-RENDER = src/render/render.c src/render/color.c src/render/render_utils.c
+RENDER = src/render/render.c src/render/color.c src/render/render_utils.c src/render/bresenham_utils.c
 GNL = get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
 
 SRCS =	$(FDF) $(PARSER) $(RENDER) $(GNL)
 
-OBJS= $(SRCS:.c=.o)
+BUILD_DIR = build
+OBJS= $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
 
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --
+
+OBJ_DIRS = $(sort $(dir $(OBJS)))
 
 all: libft libmlx $(NAME)
 
@@ -44,15 +41,15 @@ libmlx:
 
 $(NAME): $(OBJS) $(LIBFT)
 	$(CC) $(CFLAGS) -v $(OBJS) $(LIBS) -o $(NAME)
-	@echo "$(NAME) built successfully"
+	@echo "$(GREEN)$(BOLD)$(NAME)$(RESET)$(GREEN) built successfully$(RESET)"
 
 prod:
 	@$(MAKE) CFLAGS="$(CFLAGS_PROD)" all
 
 clean:
-	@rm -rf $(OBJS)
+	@rm -rf $(BUILD_DIR)
 	@rm -rf $(LIBMLX)/build
-	@echo "Cleaned object files and MLX42 build directory."
+	@echo "$(PURPLE)Cleaned $(BOLD)$(NAME)$(RESET)$(PURPLE) object files and MLX42 build directory."
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -60,7 +57,8 @@ fclean: clean
 
 re: fclean all
 
-%.o: %.c
+$(BUILD_DIR)/%.o: src/%.c
+	@mkdir -p $(OBJ_DIRS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: all clean fclean re libmlx

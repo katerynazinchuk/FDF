@@ -6,7 +6,7 @@
 /*   By: kzinchuk <kzinchuk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/18 18:22:54 by kzinchuk          #+#    #+#             */
-/*   Updated: 2025/01/30 14:31:56 by kzinchuk         ###   ########.fr       */
+/*   Updated: 2025/03/12 16:55:18 by kzinchuk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,31 +87,60 @@ typedef struct s_line
 	int	err;
 }		t_line;
 
-t_node		*add_node(char *line);
-t_node		*list_append(t_node **head, char *line);
-void		free_list(t_node *head);
-t_node		*read_fdf_map(const char *filename);
-size_t		count_strings(const char *s, char delimiter);
-int			validate_map(t_node *map_lines, char delimiter);
-t_map		*initialize_map(t_node *map_lines);
-t_map		*populate_map(t_map *map, t_node *map_lines);
-t_map		*convert_to_map(t_node *map_lines);
+typedef struct s_color
+{
+	uint8_t	r;
+	uint8_t	g;
+	uint8_t	b;
+	uint8_t	a;
+}	t_color;
 
-void		render_top_view(t_fdf *fdf);
-void		bresenham_line(t_fdf *fdf, t_render_point start, \
-							t_render_point end);
+typedef struct s_bresenham
+{
+	t_line			line;
+	t_render_point	start;
+	t_render_point	end;
+	uint32_t		color_start;
+	uint32_t		color_end;
+	int				total_steps;
+	int				current_step;
+}	t_bresenham;
 
-void		handle_close(void *param);
-void		handle_key(mlx_key_data_t keydata, void *param);
-void		error(void);
-
-void		calculate_offsets(t_fdf *fdf);
-int			hex_to_int(const char *hex);
-int			ft_abs(int n);
-uint32_t	calculate_gradient_color(t_map *map, int32_t z);
-uint32_t	interpolate_color(uint32_t start_color, uint32_t end_color, \
+int				validate_arguments(int argc);
+t_map			*validate_and_store_map(const char *filename, \
+											t_node **map_lines);
+void			start_mlx_loop(t_fdf *fdf);
+t_node			*add_node(char *line);
+t_node			*list_append(t_node **head, char *line);
+void			free_list(t_node *head);
+t_fdf			*initialize_fdf(t_map *map, t_node *map_lines);
+t_node			*read_fdf_map(const char *filename);
+size_t			count_strings(const char *s, char delimiter);
+int				validate_map(t_node *map_lines, char delimiter);
+t_map			*initialize_map(t_node *map_lines);
+t_map			*populate_map(t_map *map, t_node *map_lines);
+t_map			*convert_to_map(t_node *map_lines);
+void			render_top_view(t_fdf *fdf);
+void			handle_close(void *param);
+void			handle_key(mlx_key_data_t keydata, void *param);
+void			error(void);
+void			handle_error(t_fdf *fdf, t_node *map_lines, t_map *map);
+//render
+t_render_point	project_isometric(t_point point, float angle, t_fdf *fdf);
+void			bresenham(t_fdf *fdf, t_render_point start, t_render_point end);
+void			render_top_view(t_fdf *fdf);
+void			calculate_offsets(t_fdf *fdf);
+int				ft_abs(int n);
+t_line			new_line(t_render_point start, t_render_point end);
+int				hex_to_int(const char *hex);
+int				ft_abs(int n);
+//key_controls
+void			clear_and_render(t_fdf *fdf);// ?????
+//color
+t_color			extract_color(uint32_t color);
+uint32_t		combine_color(t_color result);
+uint32_t		interpolate_color(uint32_t start_color, uint32_t end_color, \
 													float t);
-t_line		new_line(t_render_point start, t_render_point end);
-void		clear_and_render(t_fdf *fdf);
+uint32_t		calculate_gradient_color(t_map *map, int32_t z);
 
 #endif

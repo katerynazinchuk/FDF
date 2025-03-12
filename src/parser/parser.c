@@ -12,16 +12,20 @@
 
 #include "fdf.h"
 
-static int parse_line_to_points(const char *line, t_point *points, size_t y, size_t width)
+int	parse_line_to_p(const char *line, t_point *points, size_t y, size_t width)
 {
-	char **values = ft_split(line, ' ');
+	char	**values;
+	size_t	i;
+	char	*comma_ptr;
+
+	values = ft_split(line, ' ');
 	if (!values)
 		return (0);
-	size_t i = 0;
+	i = 0;
 	while (i < width)
 	{
-		char *comma_ptr = ft_strchr(values[i], ',');
-		if(comma_ptr)
+		comma_ptr = ft_strchr(values[i], ',');
+		if (comma_ptr)
 		{
 			*comma_ptr = '\0';
 			points[i].z = (float)ft_atoi(values[i]);// * GRIDSPASE / 2;
@@ -41,47 +45,51 @@ static int parse_line_to_points(const char *line, t_point *points, size_t y, siz
 	return (1);
 }
 
-static t_point **allocate_map(size_t height, size_t width)
+static t_point	**allocate_map(size_t height, size_t width)
 {
-	t_point **array = malloc(height * sizeof(t_point *));
+	t_point	**array;
+	size_t	i;
+	size_t	j;
+
+	array = malloc(height * sizeof(t_point *));
 	if (!array)
 	{
 		perror("Failed to allocate memory for 2D array");
-		return NULL;
+		return (NULL);
 	}
-	size_t i = 0;
-	while (i < height)
+	i = -1;
+	while (++i < height)
 	{
 		array[i] = malloc(width * sizeof(t_point));
 		if (!array[i])
 		{
 			perror("Failed to allocate memory for row in 2D array");
-			size_t j = 0;
-			while (j < i)
-			{
+			j = -1;
+			while (++j < i)
 				free(array[j]);
-				j++;
-			}
 			free(array);
-			return NULL;
+			return (NULL);
 		}
-		i++;
 	}
-	return array;
+	return (array);
 }
-t_map *initialize_map(t_node *map_lines)
+
+t_map	*initialize_map(t_node *map_lines)
 {
-	t_map *map = malloc(sizeof(t_map));
+	t_map	*map;
+	t_node	*current;
+
+	map = malloc(sizeof(t_map));
 	if (!map)
 	{
 		perror("Failed to allocate memory for t_map");
-		return NULL;
+		return (NULL);
 	}
 	map->height = 0;
 	map->width = count_strings(map_lines->line, ' ');
 	map->z_min = INT32_MAX;
 	map->z_max = INT32_MIN;
-	t_node *current = map_lines;
+	current = map_lines;
 	while (current)
 	{
 		map->height++;
@@ -89,10 +97,7 @@ t_map *initialize_map(t_node *map_lines)
 	}
 	map->points = allocate_map(map->height, map->width);
 	if (!map->points)
-	{
-		free(map);
-		return (NULL);
-	}
+		return (free(map), NULL);
 	return (map);
 }
 
@@ -107,26 +112,22 @@ t_map	*populate_map(t_map *map, t_node *map_lines)
 	y = 0;
 	while (y < (size_t)map->height)
 	{
-		if (!parse_line_to_points(current->line, map->points[y], y, map->width))
+		if (!parse_line_to_p(current->line, map->points[y], y, map->width))
 		{
-			i = 0;
-			while (i < y)
-			{
+			i = -1;
+			while (++i < y)
 				free(map->points[i]);
-				i++;
-			}
 			free(map->points);
 			free(map);
 			return (NULL);
 		}
-		x = 0;
-		while (x < (size_t)map->width)
+		x = -1;
+		while (++x < (size_t)map->width)
 		{
 			if (map->points[y][x].z < map->z_min)
 				map->z_min = (int32_t)map->points[y][x].z;
 			if (map->points[y][x].z > map->z_max)
 				map->z_max = (int32_t)map->points[y][x].z;
-			x++;
 		}
 		current = current->next;
 		y++;
