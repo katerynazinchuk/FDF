@@ -36,8 +36,8 @@ int	parse_line_to_p(const char *line, t_point *points, size_t y, size_t width)
 			points[i].z = (float)ft_atoi(values[i]);// * GRIDSPASE / 2;
 			points[i].color = 0xFFFFFFFF;
 		}
-		points[i].x = (float)i * GRIDSPASE;
-		points[i].y = (float)y * GRIDSPASE;
+		points[i].x = (float)i;
+		points[i].y = (float)y;
 		free(values[i]);
 		i++;
 	}

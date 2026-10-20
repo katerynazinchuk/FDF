@@ -46,6 +46,8 @@ t_fdf	*initialize_fdf(t_map *map, t_node *map_lines)
 	}
 	fdf->offset_x = 0;
 	fdf->offset_y = 0;
+	fdf->zoom = 1;
+	fdf->z_scale = 1;
 	fdf->map = map;
 	fdf->win = mlx_init(WIDTH, HEIGHT, "fdf", true);
 	if (!fdf->win)

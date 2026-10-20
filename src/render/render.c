@@ -16,8 +16,15 @@ t_render_point	project_isometric(t_point point, float angle, t_fdf *fdf)
 {
 	t_render_point	res;
 
-	res.x = (int)((point.x - point.y) * cos(angle)) + fdf->offset_x;
-	res.y = (int)((point.x + point.y) * sin(angle) - point.z) + fdf->offset_y;
+	float	x;
+	float	y;
+	float	z;
+
+	x = point.x * fdf->zoom;
+	y = point.y * fdf->zoom;
+	z = point.z * fdf->zoom * fdf->z_scale;
+	res.x = (int)((x - y) * cos(angle)) + fdf->offset_x;
+	res.y = (int)((x + y) * sin(angle) - z) + fdf->offset_y;
 	res.z = point.z;
 	res.color = point.color;
 	return (res);
@@ -71,7 +78,7 @@ void	render_top_view(t_fdf *fdf)
 {
 	float	angle;
 
-	angle = 0.6;
+	angle = ANGLE;
 	draw_horizontal_lines(fdf, angle);
 	draw_vertical_lines(fdf, angle);
 }

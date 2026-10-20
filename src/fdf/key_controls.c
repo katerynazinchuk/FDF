@@ -31,6 +31,16 @@ void	handle_transform(mlx_key_data_t keydata, t_fdf *fdf)
 	clear_and_render(fdf);
 }
 
+static void	handle_height(mlx_key_data_t keydata, t_fdf *fdf)
+{
+	if (keydata.action == MLX_RELEASE)
+		return ;
+	if (keydata.key == MLX_KEY_EQUAL || keydata.key == MLX_KEY_KP_ADD)
+		fdf->z_scale *= Z_STEP;
+	if (keydata.key == MLX_KEY_MINUS || keydata.key == MLX_KEY_KP_SUBTRACT)
+		fdf->z_scale /= Z_STEP;
+}
+
 void	handle_key(mlx_key_data_t keydata, void *param)
 {
 	t_fdf	*fdf;
@@ -39,5 +49,6 @@ void	handle_key(mlx_key_data_t keydata, void *param)
 	if (!fdf || !fdf->map)
 		return ;
 	handle_escape(keydata, param);
+	handle_height(keydata, fdf);
 	handle_transform(keydata, fdf);
 }

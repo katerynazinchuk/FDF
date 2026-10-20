@@ -25,7 +25,9 @@
 
 # define WIDTH 2500
 # define HEIGHT 2000
-# define GRIDSPASE 5
+# define GRIDSPASE 20
+# define ANGLE 0.6
+# define Z_STEP 1.25
 # define COLOR 0x00FF00FF
 // # define ZOOM_STEP 1.1
 // #define ROT_STEP M_PI / 24
@@ -62,6 +64,8 @@ typedef struct s_fdf
 	t_map		*map;
 	int			offset_x;
 	int			offset_y;
+	float		zoom;
+	float		z_scale;
 }				t_fdf;
 
 typedef struct s_render_point
